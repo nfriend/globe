@@ -31,6 +31,20 @@
       body {
         margin: 0;
       }
+
+      .label-popover {
+        text-align: center;
+        max-width: 200px;
+        margin-top: 15px;
+        padding: 10px;
+        border-radius: 5px;
+        background-color: rgba(0, 0, 0, 0.7);
+      }
+
+      .label-popover .label-header {
+        margin-bottom: 5px;
+        font-weight: bold;
+      }
     </style>
 
     <script src="./third-party/globe.gl.min.js"></script>
@@ -88,8 +102,8 @@
                 searchParams.get('default_label');
 
               if (label) {
-                return `<div style="margin-top: 10px;">
-                          <div style="margin-bottom: 5px; font-weight: bold;">${properties.ADMIN} (${properties.ISO_A2}):</div>
+                return `<div class="label-popover">
+                          <div class="label-header">${properties.ADMIN} (${properties.ISO_A2}):</div>
                           ${label}
                         </div>`;
               } else {
