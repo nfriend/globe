@@ -6,9 +6,7 @@ workflow:
 
 pages:
   script:
-    - mkdir .public
-    - cp -r * .public
-    - mv .public public
+    - ci/pages-preparation.sh
   artifacts:
     paths:
       - public
