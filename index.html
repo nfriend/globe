@@ -47,6 +47,20 @@
       if (searchParams.get('title')) {
         document.querySelector('title').textContent = searchParams.get('title');
       }
+      if (searchParams.get('meta_og_title')) {
+        document
+          .querySelector('meta[property="og:title"]')
+          .setAttribute('content', searchParams.get('meta_og_title'));
+      }
+      if (searchParams.get('meta_og_description')) {
+        document
+          .querySelector('meta[property="og:description"]')
+          .setAttribute('content', searchParams.get('meta_og_description'));
+      }
+
+      document
+        .querySelector('meta[property="og:url"]')
+        .setAttribute('content', window.location.href);
 
       fetch('./data/countries.geojson')
         .then((res) => res.json())
