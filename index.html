@@ -40,9 +40,7 @@
     <div id="globeViz"></div>
 
     <script>
-      const searchParams = new URLSearchParams(
-        window.location.search.toLowerCase(),
-      );
+      const searchParams = new URLSearchParams(window.location.search);
 
       fetch('./data/countries.geojson')
         .then((res) => res.json())
@@ -84,6 +82,20 @@
             })
 
             .polygonStrokeColor(() => '#111')
+            .polygonLabel(({ properties }) => {
+              const label =
+                searchParams.get(properties.ISO_A2.toLowerCase() + '_label') ??
+                searchParams.get('default_label');
+
+              if (label) {
+                return `<div style="margin-top: 10px;">
+                          <div style="margin-bottom: 5px; font-weight: bold;">${properties.ADMIN} (${properties.ISO_A2}):</div>
+                          ${label}
+                        </div>`;
+              } else {
+                return null;
+              }
+            })
             .onPolygonHover((hoverD) =>
               world.polygonAltitude((d) => (d === hoverD ? 0.08 : 0.06)),
             )
