@@ -47,9 +47,28 @@
       fetch('./data/countries.geojson')
         .then((res) => res.json())
         .then((countries) => {
-          const world = Globe()
-            .globeImageUrl('./third-party/earth-night.jpg')
-            .backgroundImageUrl('./third-party/night-sky.png')
+          const world = Globe();
+
+          if (searchParams.get('background') === 'stars') {
+            world.backgroundImageUrl('./third-party/night-sky.png');
+          } else if (searchParams.get('background')) {
+            world.backgroundColor(searchParams.get('background'));
+          }
+
+          world.polygonSideColor(() => 'rgba(0, 100, 0, 0.15)');
+
+          if (searchParams.get('globe_style') === 'hollow') {
+            world
+              .showGlobe(false)
+              .showAtmosphere(false)
+              .polygonSideColor(() => 'rgba(0, 0, 0, 0)');
+          } else if (searchParams.get('globe_style') === 'day') {
+            world.globeImageUrl('./third-party/earth-blue-marble.jpg');
+          } else {
+            world.globeImageUrl('./third-party/earth-night.jpg');
+          }
+
+          world
             .lineHoverPrecision(0)
             .polygonsData(
               countries.features.filter((d) => d.properties.ISO_A2 !== 'AQ'),
@@ -61,14 +80,12 @@
               );
               const defaultColor = searchParams.get('default_color');
 
-              return countryColor ?? defaultColor ?? '#2e3330';
+              return countryColor ?? defaultColor ?? 'gray';
             })
-            .polygonSideColor(() => 'rgba(0, 100, 0, 0.15)')
+
             .polygonStrokeColor(() => '#111')
-            .onPolygonHover(
-              (hoverD) =>
-                world.polygonAltitude((d) => (d === hoverD ? 0.08 : 0.06)),
-              // .polygonCapColor((d) => (d === hoverD ? 'steelblue' : 'red')),
+            .onPolygonHover((hoverD) =>
+              world.polygonAltitude((d) => (d === hoverD ? 0.08 : 0.06)),
             )
             .polygonsTransitionDuration(150)(
             document.getElementById('globeViz'),
