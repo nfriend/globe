@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>World Map</title>
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, shrink-to-fit=no"
+    />
+    <meta
+      property="og:image"
+      content="https://world-map.nathanfriend.io/screenshot.jpg"
+    />
+    <meta property="og:title" content="World Map" />
+    <meta property="og:type" content="article" />
+    <meta property="og:url" content="https://world-map.nathanfriend.io" />
+    <meta
+      property="og:description"
+      content="A web page that displays a world map, configured by data passed through the URL"
+    />
+
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+    <link rel="manifest" href="/site.webmanifest" />
+    <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5" />
+    <meta name="msapplication-TileColor" content="#da532c" />
+    <meta name="theme-color" content="#333333" />
+
+    <style>
+      body {
+        margin: 0;
+      }
+    </style>
+
+    <script src="./third-party/globe.gl.min.js"></script>
+  </head>
+
+  <body>
+    <div id="globeViz"></div>
+
+    <script>
+      const searchParams = new URLSearchParams(
+        window.location.search.toLowerCase(),
+      );
+
+      if (searchParams.get('title')) {
+        document.querySelector('title').textContent = searchParams.get('title');
+      }
+
+      fetch('./data/countries.geojson')
+        .then((res) => res.json())
+        .then((countries) => {
+          const world = Globe()
+            .globeImageUrl('./third-party/earth-night.jpg')
+            .backgroundImageUrl('./third-party/night-sky.png')
+            .lineHoverPrecision(0)
+            .polygonsData(
+              countries.features.filter((d) => d.properties.ISO_A2 !== 'AQ'),
+            )
+            .polygonAltitude(0.06)
+            .polygonCapColor((feat) => {
+              const countryColor = searchParams.get(
+                feat.properties.ISO_A2.toLowerCase() + '_color',
+              );
+              const defaultColor = searchParams.get('default_color');
+
+              return countryColor ?? defaultColor ?? '#2e3330';
+            })
+            .polygonSideColor(() => 'rgba(0, 100, 0, 0.15)')
+            .polygonStrokeColor(() => '#111')
+            .onPolygonHover(
+              (hoverD) =>
+                world.polygonAltitude((d) => (d === hoverD ? 0.08 : 0.06)),
+              // .polygonCapColor((d) => (d === hoverD ? 'steelblue' : 'red')),
+            )
+            .polygonsTransitionDuration(150)(
+            document.getElementById('globeViz'),
+          );
+        });
+    </script>
+  </body>
+</html>
