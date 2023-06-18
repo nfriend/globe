@@ -180,6 +180,11 @@
           const countryAltitude = 0.01;
           const hoverLift = parseFloat(searchParams.get('hover_lift') ?? 0.02);
 
+          window.addEventListener('resize', (event) => {
+            world.width([event.target.innerWidth]);
+            world.height([event.target.innerHeight]);
+          });
+
           world
             .lineHoverPrecision(0)
             .polygonsData(countries.features)
