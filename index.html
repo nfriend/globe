@@ -48,6 +48,7 @@
     </style>
 
     <script src="./third-party/globe.gl.min.js"></script>
+    <script src="./third-party/d3.min.js"></script>
   </head>
 
   <body>
@@ -59,11 +60,44 @@
       fetch('./data/countries.geojson')
         .then((res) => res.json())
         .then((countries) => {
+          // Get a mapping of all countries to the value specified
+          // in the URL via [country code]_value
+          const countryVals = countries.features
+            .map((f) => f.properties.ISO_A2.toLowerCase())
+            .filter((code) => /^[a-z]{2}$/.test(code))
+            .reduce((acc, code) => {
+              if (searchParams.has(code + '_value')) {
+                acc[code] = parseFloat(searchParams.get(code + '_value'));
+              } else {
+                acc[code] = searchParams.get('default_value') ?? 0;
+              }
+
+              return acc;
+            }, {});
+
+          const maxCountryVal = Math.max(...Object.values(countryVals));
+          const minCountryVal = Math.min(...Object.values(countryVals));
+
+          const allowedInterpolateFns = Object.keys(d3).filter((fnName) =>
+            /^interpolate.*$/.test(fnName),
+          );
+
+          const requestedInterpolateFn = searchParams.get('interpolate_fn');
+          const interpolateFn =
+            requestedInterpolateFn &&
+            allowedInterpolateFns.includes(requestedInterpolateFn)
+              ? requestedInterpolateFn
+              : 'interpolateYlOrRd';
+
+          const colorScale = d3
+            .scaleSequentialSqrt(d3[interpolateFn])
+            .domain([minCountryVal, maxCountryVal]);
+
           const world = Globe();
 
           if (searchParams.get('background') === 'stars') {
             world.backgroundImageUrl('./third-party/night-sky.png');
-          } else if (searchParams.get('background')) {
+          } else if (searchParams.has('background')) {
             world.backgroundColor(searchParams.get('background'));
           }
 
@@ -82,17 +116,22 @@
 
           world
             .lineHoverPrecision(0)
-            .polygonsData(
-              countries.features.filter((d) => d.properties.ISO_A2 !== 'AQ'),
-            )
+            .polygonsData(countries.features)
             .polygonAltitude(0.06)
             .polygonCapColor((feat) => {
-              const countryColor = searchParams.get(
-                feat.properties.ISO_A2.toLowerCase() + '_color',
-              );
+              const countryCode = feat.properties.ISO_A2.toLowerCase();
+              const countryColor = searchParams.get(countryCode + '_color');
+
+              const countryValueColor =
+                (searchParams.has(countryCode + '_value') ||
+                  searchParams.has('default_value')) &&
+                colorScale(countryVals[countryCode]);
+
               const defaultColor = searchParams.get('default_color');
 
-              return countryColor ?? defaultColor ?? 'gray';
+              return (
+                countryColor || countryValueColor || defaultColor || 'gray'
+              );
             })
 
             .polygonStrokeColor(() => '#111')
