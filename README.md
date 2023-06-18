@@ -4,7 +4,7 @@ A web page that displays a world map, configured by data passed through the URL.
 
 ## Usage
 
-To use this map, link to https://world-map.nathanfriend.io with any of the URL query parameters in the table below. Note that all query parameter keys must be lowercase (e.g. `us_color`, _not_ `US_color`).
+To use this map, link to https://world-map.nathanfriend.io with any of the URL hash parameters in the table below. Note that all hash parameter keys must be lowercase (e.g. `us_color`, _not_ `US_color`).
 
 There are two main ways to color the map:
 

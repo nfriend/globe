@@ -92,7 +92,9 @@
     </div>
 
     <script>
-      const searchParams = new URLSearchParams(window.location.search);
+      const searchParams = new URLSearchParams(
+        window.location.hash.replace('#', '?'),
+      );
 
       if ([...searchParams].length === 0) {
         document.querySelector('#help-dialog').classList.add('shown');
