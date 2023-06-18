@@ -107,12 +107,11 @@
           // in the URL via [country code]_value
           const countryVals = countries.features
             .map((f) => f.properties.ISO_A2.toLowerCase())
-            .filter((code) => /^[a-z]{2}$/.test(code))
             .reduce((acc, code) => {
               if (searchParams.has(code + '_value')) {
                 acc[code] = parseFloat(searchParams.get(code + '_value'));
-              } else {
-                acc[code] = searchParams.get('default_value') ?? 0;
+              } else if (searchParams.has('default_value')) {
+                acc[code] = searchParams.get('default_value');
               }
 
               return acc;
