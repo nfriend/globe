@@ -101,39 +101,46 @@
             world.backgroundColor(searchParams.get('background'));
           }
 
-          world.polygonSideColor(() => 'rgba(0, 100, 0, 0.15)');
-
           if (searchParams.get('globe_style') === 'hollow') {
             world
               .showGlobe(false)
               .showAtmosphere(false)
               .polygonSideColor(() => 'rgba(0, 0, 0, 0)');
-          } else if (searchParams.get('globe_style') === 'day') {
-            world.globeImageUrl('./third-party/earth-blue-marble.jpg');
-          } else {
+          } else if (searchParams.get('globe_style') === 'night') {
             world.globeImageUrl('./third-party/earth-night.jpg');
+          } else {
+            world.globeImageUrl('./third-party/earth-day.jpg');
           }
+
+          const computeCountryColor = (countryCode, darken = false) => {
+            const countryColor = searchParams.get(countryCode + '_color');
+
+            const countryValueColor =
+              (searchParams.has(countryCode + '_value') ||
+                searchParams.has('default_value')) &&
+              colorScale(countryVals[countryCode]);
+
+            const defaultColor = searchParams.get('default_color');
+
+            const color =
+              countryColor || countryValueColor || defaultColor || 'gray';
+
+            return darken ? d3.color(color).darker() : color;
+          };
+
+          const countryAltitude = 0.01;
+          const hoverLift = parseFloat(searchParams.get('hover_lift') ?? 0.02);
 
           world
             .lineHoverPrecision(0)
             .polygonsData(countries.features)
-            .polygonAltitude(0.06)
-            .polygonCapColor((feat) => {
-              const countryCode = feat.properties.ISO_A2.toLowerCase();
-              const countryColor = searchParams.get(countryCode + '_color');
-
-              const countryValueColor =
-                (searchParams.has(countryCode + '_value') ||
-                  searchParams.has('default_value')) &&
-                colorScale(countryVals[countryCode]);
-
-              const defaultColor = searchParams.get('default_color');
-
-              return (
-                countryColor || countryValueColor || defaultColor || 'gray'
-              );
-            })
-
+            .polygonAltitude(countryAltitude)
+            .polygonCapColor((feat) =>
+              computeCountryColor(feat.properties.ISO_A2.toLowerCase()),
+            )
+            .polygonSideColor((feat) =>
+              computeCountryColor(feat.properties.ISO_A2.toLowerCase(), true),
+            )
             .polygonStrokeColor(() => '#111')
             .polygonLabel(({ properties }) => {
               const label =
@@ -150,7 +157,9 @@
               }
             })
             .onPolygonHover((hoverD) =>
-              world.polygonAltitude((d) => (d === hoverD ? 0.08 : 0.06)),
+              world.polygonAltitude((d) =>
+                d === hoverD ? countryAltitude + hoverLift : countryAltitude,
+              ),
             )
             .polygonsTransitionDuration(150)(
             document.getElementById('globeViz'),
