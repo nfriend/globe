@@ -16,6 +16,8 @@ _Disclaimer: These are just for demonstration purposes! The data was generated b
 
 To use this map, link to https://world-map.nathanfriend.io with any of the URL hash parameters in the table below. Note that all hash parameter keys must be lowercase (e.g. `us_color`, _not_ `US_color`).
 
+For example: https://world-map.nathanfriend.io/#us_color=red&us_label=This%20country%20is%20red
+
 There are two main ways to color the map:
 
 1. **Explicit colors:** specific colors are provided for each country using URL parameters like `us_color=red&ca_color=blue`.
