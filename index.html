@@ -2,7 +2,7 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <title>World Map</title>
+    <title>Globe</title>
     <meta
       name="viewport"
       content="width=device-width, initial-scale=1, shrink-to-fit=no"
@@ -11,12 +11,12 @@
       property="og:image"
       content="https://globe.nathanfriend.io/screenshot.jpg"
     />
-    <meta property="og:title" content="World Map" />
+    <meta property="og:title" content="Globe" />
     <meta property="og:type" content="article" />
     <meta property="og:url" content="https://globe.nathanfriend.io" />
     <meta
       property="og:description"
-      content="A web page that displays a world map, configured by data passed through the URL"
+      content="A web page that displays a choropleth map on a globe that is configured by data passed through the URL."
     />
 
     <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
@@ -144,12 +144,12 @@
             .scaleSequentialSqrt(d3[interpolateFn])
             .domain([minCountryVal, maxCountryVal]);
 
-          const world = Globe();
+          const globe = Globe();
 
           if (searchParams.has('background')) {
-            world.backgroundColor(searchParams.get('background'));
+            globe.backgroundColor(searchParams.get('background'));
           } else {
-            world.backgroundImageUrl('./third-party/night-sky.png');
+            globe.backgroundImageUrl('./third-party/night-sky.png');
           }
 
           const computeCountryColor = (countryCode, darken = false) => {
@@ -169,19 +169,19 @@
           };
 
           if (searchParams.get('globe_style') === 'hollow') {
-            world
+            globe
               .showGlobe(false)
               .showAtmosphere(false)
               .polygonSideColor(() => 'rgba(0, 0, 0, 0)');
           } else {
-            world.polygonSideColor((feat) =>
+            globe.polygonSideColor((feat) =>
               computeCountryColor(feat.properties.ISO_A2.toLowerCase(), true),
             );
 
             if (searchParams.get('globe_style') === 'night') {
-              world.globeImageUrl('./third-party/earth-night.jpg');
+              globe.globeImageUrl('./third-party/earth-night.jpg');
             } else {
-              world.globeImageUrl('./third-party/earth-day.jpg');
+              globe.globeImageUrl('./third-party/earth-day.jpg');
             }
           }
 
@@ -189,11 +189,11 @@
           const hoverLift = parseFloat(searchParams.get('hover_lift') ?? 0.02);
 
           window.addEventListener('resize', (event) => {
-            world.width([event.target.innerWidth]);
-            world.height([event.target.innerHeight]);
+            globe.width([event.target.innerWidth]);
+            globe.height([event.target.innerHeight]);
           });
 
-          world
+          globe
             .lineHoverPrecision(0)
             .polygonsData(countries.features)
             .polygonAltitude(countryAltitude)
@@ -216,7 +216,7 @@
               }
             })
             .onPolygonHover((hoverD) =>
-              world.polygonAltitude((d) =>
+              globe.polygonAltitude((d) =>
                 d === hoverD ? countryAltitude + hoverLift : countryAltitude,
               ),
             )
