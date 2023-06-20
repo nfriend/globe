@@ -9,11 +9,11 @@
     />
     <meta
       property="og:image"
-      content="https://world-map.nathanfriend.io/screenshot.jpg"
+      content="https://globe.nathanfriend.io/screenshot.jpg"
     />
     <meta property="og:title" content="World Map" />
     <meta property="og:type" content="article" />
-    <meta property="og:url" content="https://world-map.nathanfriend.io" />
+    <meta property="og:url" content="https://globe.nathanfriend.io" />
     <meta
       property="og:description"
       content="A web page that displays a world map, configured by data passed through the URL"
@@ -74,16 +74,22 @@
     <div id="globeViz"></div>
 
     <div id="help-dialog">
-      <h1>Welcome to world-map.nathanfriend.io!</h1>
+      <h1>Welcome to <span id="site-name">globe.nathanfriend.io</span>!</h1>
       <p>
-        This web page displays a world map that is configured by data passed
-        through the URL.
+        This web page displays a
+        <a
+          style="color: white"
+          href="https://en.wikipedia.org/wiki/Choropleth_map"
+          target="_blank"
+          >choropleth map</a
+        >
+        on a globe that is configured by data passed through the URL.
       </p>
       <p>
         There are currently no URL parameters provided. Check out
         <a
           style="color: white; font-weight: bold"
-          href="https://gitlab.com/nfriend/world-map/-/blob/main/README.md"
+          href="https://gitlab.com/nfriend/globe/-/blob/main/README.md"
           target="_blank"
           >the README</a
         >
@@ -99,6 +105,9 @@
       if ([...searchParams].length === 0) {
         document.querySelector('#help-dialog').classList.add('shown');
       }
+
+      document.querySelector('#site-name').textContent =
+        window.location.hostname;
 
       fetch('./data/countries.geojson')
         .then((res) => res.json())
